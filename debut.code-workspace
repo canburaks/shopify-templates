@@ -1,7 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "cbs-debut"
+		},
+		{
+			"path": "yedek-debut/debut-cbs"
 		}
 	]
 }

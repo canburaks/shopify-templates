@@ -1,0 +1,128 @@
+{%- if section.settings.hero_layout == 'full_width' and section.settings.hero_size == 'adapt' -%}
+  {%- if section.settings.image.aspect_ratio == blank -%}
+    {%- assign min_aspect_ratio = 2.0 -%}
+  {%- else -%}
+    {%- assign min_aspect_ratio = section.settings.image.aspect_ratio -%}
+  {%- endif -%}
+  {%- assign wrapper_height = 100 | divided_by: min_aspect_ratio -%}
+  {%- style -%}
+    .hero-{{ section.id }} {
+      height: {{- wrapper_height -}}vw !important;
+    }
+  {%- endstyle -%}
+{%- endif -%}
+<div data-section-id="{{ section.id }}" data-section-type="hero-section">
+  {%- if section.settings.hero_layout == 'fixed_width' -%}
+    <div class="page-width">
+  {%- endif -%}
+  {%- if section.settings.hero_layout == 'fixed_width' and section.settings.hero_size ==  'adapt' -%}
+    {%- assign slide_width = 1090 -%}
+    {%- assign min_aspect_ratio = section.settings.image.aspect_ratio | default: 2.0 -%}
+    <div class="hero-fixed-width hero--adapt"
+         id="Hero-{{ section.id }}"
+         data-layout="{{ section.settings.hero_layout }}">
+      {%- assign img_url = section.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+      {%- if section.settings.image.width < max_width -%}
+        {%- assign slide_width = section.settings.image.width -%}
+      {%- endif -%}
+      <div class="hero-fixed-width__content">
+        <div class="page-width text-center">
+          {%- if section.settings.title != blank -%}
+            <h2 class="h1 mega-title{% if section.settings.text_size == 'large' %} mega-title--large{% endif %}">{{ section.settings.title | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="rte-setting mega-subtitle{% if section.settings.text_size == 'large' %} mega-subtitle--large{% endif %}">{{ section.settings.text }}</div>
+          {%- endif -%}
+          {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+            <a href="{{ section.settings.button_link }}" class="btn hero__btn">
+              {{ section.settings.button_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+      {%- if section.settings.image != blank -%}
+        <img class="hero-fixed-width__image lazyload lazypreload"
+             src="{{ section.settings.image | img_url: '300x300' }}"
+             data-src="{{ img_url }}"
+             data-widths="[180, 360, 470, 600, 770, 970, 1060, 1280, 1512, 1728, 2048]"
+             data-aspectratio="{{ section.settings.image.aspect_ratio }}"
+             data-sizes="auto"
+             style="{%- if slide_width <= max_width -%}
+                      {%- assign min_width = slide_width | times: 100 | divided_by: max_width -%}
+                      min-width: {{ min_width }}%;
+                    {%- endif -%}
+                    object-position: {{ section.settings.alignment }};"
+             alt="{{ section.settings.image.alt | escape }}">
+      {%- else -%}
+        <span>
+          {% capture current %}{% cycle 1, 2 %}{% endcapture %}
+          {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+        </span>
+      {%- endif -%}
+      <noscript>
+        <div class="hero-fixed-width__image"{% if section.settings.image %}{% unless section.settings.image.alt == blank %} role="img" aria-label="{{ section.settings.image.alt | escape }}"{% endunless %} style="background-image: url('{{ section.settings.image | img_url: '2048x' }}'); background-position: center {{ section.settings.alignment }};"{% endif %}></div>
+      </noscript>
+    </div>
+  {%- else -%}
+    <div class="hero hero--{{ section.settings.hero_size }} hero-{{ section.id }}{% if section.settings.title != blank or section.settings.text != blank or section.settings.button_label != blank %} hero__overlay{% endif %} box ratio-container lazyload js"
+         id="Hero-{{ section.id }}"
+         data-layout="{{ section.settings.hero_layout }}"
+         {%- if section.settings.image -%}
+          {% unless section.settings.image.alt == blank %}
+          role="img"
+          aria-label="{{ section.settings.image.alt | escape }}"
+          data-alt="{{ section.settings.image.alt | escape }}"
+          {% endunless %}
+         data-bg="{{ section.settings.image | img_url: '300x300' }}"
+         data-bgset="{% include 'bgset', image: section.settings.image %}"
+         data-sizes="auto"
+         data-parent-fit="cover"
+         style="background-position: {{ section.settings.alignment }}; background-image: url('{{ section.settings.image | img_url: '300x300' }});"
+         {%- endif -%}>
+    {%- if section.settings.image == blank -%}
+      <div class="placeholder-background">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+      <div class="hero__inner">
+        <div class="page-width text-center">
+          {%- if section.settings.title != blank -%}
+            <h2 class="h1 mega-title{% if section.settings.text_size == 'large' %} mega-title--large{% endif %}">{{ section.settings.title | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="rte-setting mega-subtitle{% if section.settings.text_size == 'large' %} mega-subtitle--large{% endif %}">{{ section.settings.text }}</div>
+          {%- endif -%}
+          {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+            {%- capture ariaLabel -%}
+              {{- section.settings.button_label -}}
+              {%- if section.settings.button_link.type == 'frontpage_link' -%}
+                : {{ 'homepage.general.title' | t -}}
+              {%- elsif section.settings.button_link.type == 'catalog_link' -%}
+                : {{ 'collections.catalog.title' | t -}}
+              {%- elsif section.settings.button_link.object.title -%}
+                : {{ section.settings.button_link.object.title -}}
+              {%- endif -%}
+            {%- endcapture -%}
+
+            <a href="{{ section.settings.button_link }}"
+              class="btn hero__btn"
+              aria-label="{{ ariaLabel }}">
+              {{- section.settings.button_label | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+    <noscript>
+      <div class="hero hero--{{ section.settings.hero_size }}{% if section.settings.title != blank or section.settings.text != blank or section.settings.button_label != blank %} hero__overlay{% endif %}"{% if section.settings.image %}{% unless section.settings.image.alt == blank %} role="img" aria-label="{{ section.settings.image.alt | escape }}"{% endunless %} style="background-image: url('{{ section.settings.image | img_url: '2048x' }}'); background-position: center {{ section.settings.alignment }};"{% endif %}></div>
+    </noscript>
+  {%- endif -%}
+  {%- if section.settings.hero_layout == 'fixed_width' -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{"name":{"da":"Billede med tekstoverlejring","de":"Foto mit \u00fcberlegtem Text","en":"Image with text overlay","es":"Imagen con texto","fi":"Kuva p\u00e4\u00e4ll\u00e4 olevalla tekstill\u00e4","fr":"Image avec texte","hi":"\u092a\u093e\u0920 \u0913\u0935\u0930\u0932\u0947 \u0915\u0947 \u0938\u093e\u0925 \u0907\u092e\u0947\u091c","it":"Immagine con testo","ja":"\u30c6\u30ad\u30b9\u30c8\u30aa\u30fc\u30d0\u30fc\u30ec\u30a4\u4ed8\u304d\u753b\u50cf","ko":"\ud14d\uc2a4\ud2b8 \uc624\ubc84\ub808\uc774 \ud3ec\ud568 \uc774\ubbf8\uc9c0","nb":"Bilde med tekstoverlegg","nl":"Foto met tekstoverlay","pt-BR":"Imagem com texto","pt-PT":"Imagem com sobreposi\u00e7\u00e3o de texto","sv":"Bild med text\u00f6verlagring","th":"\u0e01\u0e32\u0e23\u0e27\u0e32\u0e07\u0e0b\u0e49\u0e2d\u0e19\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21","zh-CN":"\u5e26\u6587\u672c\u53e0\u52a0\u7684\u56fe\u7247","zh-TW":"\u9644\u6587\u5b57\u758a\u52a0\u7684\u5716\u7247"},"class":"index-section index-section--flush","settings":[{"type":"image_picker","id":"image","label":{"da":"Billede","de":"Foto","en":"Image","es":"Imagen","fi":"Kuva","fr":"Image","hi":"\u0907\u092e\u0947\u091c","it":"Immagine","ja":"\u753b\u50cf","ko":"\uc774\ubbf8\uc9c0","nb":"Bilde","nl":"Afbeelding","pt-BR":"Imagem","pt-PT":"Imagem","sv":"Bild","th":"\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e","zh-CN":"\u56fe\u7247","zh-TW":"\u5716\u7247"}},{"type":"select","id":"alignment","label":{"da":"Justering af billede","de":"Fotoausrichtung","en":"Image alignment","es":"Alineaci\u00f3n de imagen","fi":"Kuvan tasaus","fr":"Alignement de l'image","hi":"\u0907\u092e\u0947\u091c \u092a\u0902\u0915\u094d\u0924\u093f\u092c\u0926\u094d\u0927 \u0915\u0930\u0928\u093e","it":"Allineamento immagine","ja":"\u753b\u50cf\u30a2\u30e9\u30a4\u30f3\u30e1\u30f3\u30c8","ko":"\uc774\ubbf8\uc9c0 \uc815\ub82c","nb":"Bildejustering","nl":"Afbeelding uitlijnen","pt-BR":"Alinhamento da imagem","pt-PT":"Alinhamento da imagem","sv":"Bildjustering","th":"\u0e01\u0e32\u0e23\u0e08\u0e31\u0e14\u0e27\u0e32\u0e07\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e","zh-CN":"\u56fe\u7247\u5bf9\u9f50\u65b9\u5f0f","zh-TW":"\u5716\u7247\u5c0d\u9f4a"},"default":"center","options":[{"value":"top","label":{"da":"Top","de":"Oben","en":"Top","es":"Superior","fi":"Yl\u00f6s","fr":"Haut","hi":"\u0938\u092c\u0938\u0947 \u090a\u092a\u0930","it":"In alto","ja":"\u4e0a","ko":"\uc704\ucabd","nb":"Topp","nl":"Boven","pt-BR":"Acima","pt-PT":"Acima","sv":"H\u00f6gst upp","th":"\u0e14\u0e49\u0e32\u0e19\u0e1a\u0e19","zh-CN":"\u9876\u90e8","zh-TW":"\u9802\u90e8"}},{"value":"center","label":{"da":"I midten","de":"Mitte","en":"Middle","es":"Al medio","fi":"Keskelle","fr":"Milieu","hi":"\u092e\u0927\u094d\u092f \u092e\u0947\u0902","it":"Al centro","ja":"\u4e2d\u592e","ko":"\uc911\uac04","nb":"Midten","nl":"Midden","pt-BR":"Meio","pt-PT":"Meio","sv":"Mitten","th":"\u0e15\u0e23\u0e07\u0e01\u0e25\u0e32\u0e07","zh-CN":"\u4e2d\u95f4","zh-TW":"\u4e2d\u592e"}},{"value":"bottom","label":{"da":"Bund","de":"Unten","en":"Bottom","es":"Inferior","fi":"Alas","fr":"Bas","hi":"\u0928\u0940\u091a\u0947 \u0915\u093e","it":"In basso","ja":"\u4e0b","ko":"\uc544\ub798\ucabd","nb":"Bunn","nl":"Onder","pt-BR":"Abaixo","pt-PT":"Abaixo","sv":"L\u00e4ngst ner","th":"\u0e14\u0e49\u0e32\u0e19\u0e25\u0e48\u0e32\u0e07","zh-CN":"\u5e95\u90e8","zh-TW":"\u5e95\u90e8"}}]},{"type":"select","id":"hero_layout","label":{"da":"Layout","de":"Layout","en":"Layout","es":"Dise\u00f1o","fi":"Asettelu","fr":"Mise en page","hi":"\u0932\u0947\u0906\u0909\u091f","it":"Layout","ja":"\u30ec\u30a4\u30a2\u30a6\u30c8","ko":"\ub808\uc774\uc544\uc6c3","nb":"Oppsett","nl":"Opmaak","pt-BR":"Layout","pt-PT":"Esquema","sv":"Layout","th":"\u0e40\u0e25\u0e22\u0e4c\u0e40\u0e2d\u0e32\u0e15\u0e4c","zh-CN":"\u5e03\u5c40","zh-TW":"\u7248\u9762\u914d\u7f6e"},"default":"full_width","options":[{"label":{"da":"Fuld bredde","de":"Volle Breite","en":"Full width","es":"Ancho completo","fi":"T\u00e4ysi leveys","fr":"Pleine largeur","hi":"\u092a\u0942\u0930\u094d\u0923 \u091a\u094c\u0921\u093c\u093e\u0908","it":"Intera larghezza","ja":"\u5168\u5e45","ko":"\uc804\uccb4 \ud3ed","nb":"Full bredde","nl":"Volledige breedte","pt-BR":"Largura completa","pt-PT":"Largura total","sv":"Full bredd","th":"\u0e40\u0e15\u0e47\u0e21\u0e04\u0e27\u0e32\u0e21\u0e01\u0e27\u0e49\u0e32\u0e07","zh-CN":"\u5168\u5bbd","zh-TW":"\u5168\u5bec\u5ea6"},"value":"full_width"},{"label":{"da":"Fast bredde","de":"Feste Breite","en":"Fixed width","es":"Ancho fijo","fi":"Kiinte\u00e4 leveys","fr":"Largeur fixe","hi":"\u0928\u093f\u0936\u094d\u091a\u093f\u0924 \u091a\u094c\u0921\u093c\u093e\u0908","it":"Larghezza fissa","ja":"\u56fa\u5b9a\u5e45","ko":"\uace0\uc815 \ud3ed","nb":"Fast bredde","nl":"Vaste breedte","pt-BR":"Largura fixa","pt-PT":"Largura fixa","sv":"Fast bredd","th":"\u0e04\u0e27\u0e32\u0e21\u0e01\u0e27\u0e49\u0e32\u0e07\u0e15\u0e32\u0e22\u0e15\u0e31\u0e27","zh-CN":"\u56fa\u5b9a\u5bbd\u5ea6","zh-TW":"\u56fa\u5b9a\u5bec\u5ea6"},"value":"fixed_width"}]},{"type":"select","id":"hero_size","label":{"da":"H\u00f8jde p\u00e5 afsnit","de":"Bereichs-H\u00f6he","en":"Section height","es":"Altura de la secci\u00f3n","fi":"Osan korkeus","fr":"Hauteur de la section","hi":"\u0938\u0947\u0915\u094d\u0936\u0928 \u0915\u0940 \u090a\u0902\u091a\u093e\u0908","it":"Altezza sezione","ja":"\u30bb\u30af\u30b7\u30e7\u30f3\u306e\u9ad8\u3055","ko":"\uc139\uc158 \ub192\uc774","nb":"H\u00f8yde p\u00e5 del","nl":"Sectiehoogte","pt-BR":"Altura da se\u00e7\u00e3o","pt-PT":"Altura da sec\u00e7\u00e3o","sv":"Sektionsh\u00f6jd","th":"\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e39\u0e07\u0e02\u0e2d\u0e07\u0e2a\u0e48\u0e27\u0e19","zh-CN":"\u5206\u533a\u9ad8\u5ea6","zh-TW":"\u5340\u584a\u9ad8\u5ea6"},"default":"medium","options":[{"label":{"da":"Tilpas til billede","de":"An Bild anpassen","en":"Adapt to image","es":"Adaptar a la imagen","fi":"Sovita kuvaan","fr":"S'adapter \u00e0 l'image","hi":"\u0907\u092e\u0947\u091c \u0915\u0947 \u0905\u0928\u0941\u0915\u0942\u0932 \u092c\u0928\u093e\u090f\u0902","it":"Adatta all'immagine","ja":"\u753b\u50cf\u306b\u9069\u5fdc\u3059\u308b","ko":"\uc774\ubbf8\uc9c0\uc5d0 \ub9de\ucda4","nb":"Tilpass til bilde","nl":"Aanpassen aan afbeelding","pt-BR":"Adaptar \u00e0 imagem","pt-PT":"Adaptar \u00e0 imagem","sv":"Anpassa till bild","th":"\u0e1b\u0e23\u0e31\u0e1a\u0e15\u0e32\u0e21\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e","zh-CN":"\u9002\u5e94\u56fe\u7247","zh-TW":"\u914d\u5408\u5716\u7247"},"value":"adapt"},{"label":{"da":"Ekstra lille","de":"Extra klein","en":"Extra Small","es":"Extra peque\u00f1a","fi":"Erikoispieni","fr":"Tr\u00e8s petite","hi":"\u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924 \u091b\u094b\u091f\u093e","it":"Molto piccola","ja":"\u6975\u5c0f","ko":"\ud2b9\uc18c","nb":"Ekstra liten","nl":"Extra klein","pt-BR":"Extra pequeno","pt-PT":"Extra pequeno","sv":"Extra liten","th":"\u0e02\u0e19\u0e32\u0e14\u0e40\u0e25\u0e47\u0e01\u0e1e\u0e34\u0e40\u0e28\u0e29","zh-CN":"\u7279\u5c0f","zh-TW":"\u8d85\u5c0f\u578b"},"value":"x-small"},{"label":{"da":"Lille","de":"Klein","en":"Small","es":"Peque\u00f1a","fi":"Pieni","fr":"Petite","hi":"\u091b\u094b\u091f\u093e","it":"Small","ja":"\u5c0f","ko":"\uc2a4\ubab0","nb":"Liten","nl":"Klein","pt-BR":"Pequeno","pt-PT":"Pequeno","sv":"Liten","th":"\u0e40\u0e25\u0e47\u0e01","zh-CN":"\u5c0f","zh-TW":"\u5c0f\u578b"},"value":"small"},{"label":{"da":"Medium","de":"Mitte","en":"Medium","es":"Mediana","fi":"Keskisuuri","fr":"Moyenne","hi":"\u092e\u0927\u094d\u092f\u092e","it":"Medium","ja":"\u4e2d","ko":"\ubcf4\ud1b5","nb":"Middels","nl":"Gemiddeld","pt-BR":"M\u00e9dio","pt-PT":"M\u00e9dio","sv":"Medium","th":"\u0e1b\u0e32\u0e19\u0e01\u0e25\u0e32\u0e07","zh-CN":"\u4e2d\u7b49","zh-TW":"\u4e2d\u7b49"},"value":"medium"},{"label":{"da":"Stor","de":"Gro\u00df","en":"Large","es":"Grande","fi":"Suuri","fr":"Grande","hi":"\u092c\u0921\u093c\u093e","it":"Large","ja":"\u5927","ko":"\ub77c\uc9c0","nb":"Stor","nl":"Groot","pt-BR":"Grande","pt-PT":"Grande","sv":"Stor","th":"\u0e43\u0e2b\u0e0d\u0e48","zh-CN":"\u5927","zh-TW":"\u5927\u578b"},"value":"large"},{"label":{"da":"Ekstra stor","de":"Extra gro\u00df","en":"Extra Large","es":"Extra grande","fi":"Erikoissuuri","fr":"Tr\u00e8s grande","hi":"\u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924 \u092c\u0921\u093c\u093e","it":"Molto grande","ja":"\u7279\u5927","ko":"\ud2b9\ub300","nb":"Ekstra stort","nl":"Extra groot","pt-BR":"Extra grande","pt-PT":"Extra grande","sv":"Extra stor","th":"\u0e02\u0e19\u0e32\u0e14\u0e43\u0e2b\u0e0d\u0e48\u0e1e\u0e34\u0e40\u0e28\u0e29","zh-CN":"\u7279\u5927","zh-TW":"\u8d85\u5927\u578b"},"value":"x-large"}]},{"type":"select","id":"text_size","label":{"da":"Tekstst\u00f8rrelse","de":"Textgr\u00f6\u00dfe","en":"Text size","es":"Tama\u00f1o del texto","fi":"Tekstin koko","fr":"Taille du texte","hi":"\u091f\u0947\u0915\u094d\u0938\u094d\u091f \u0906\u0915\u093e\u0930","it":"Dimensione testo","ja":"\u6587\u5b57\u30b5\u30a4\u30ba","ko":"\ud14d\uc2a4\ud2b8 \uc0ac\uc774\uc988","nb":"Tekstst\u00f8rrelse","nl":"Tekengrootte","pt-BR":"Tamanho do texto","pt-PT":"Tamanho do texto","sv":"Textstorlek","th":"\u0e02\u0e19\u0e32\u0e14\u0e15\u0e31\u0e27\u0e2d\u0e31\u0e01\u0e29\u0e23","zh-CN":"\u6587\u672c\u5927\u5c0f","zh-TW":"\u6587\u5b57\u5c3a\u5bf8"},"default":"medium","options":[{"label":{"da":"Medium","de":"Mitte","en":"Medium","es":"Mediano","fi":"Keskisuuri","fr":"Moyenne","hi":"\u092e\u0927\u094d\u092f\u092e","it":"Medium","ja":"\u4e2d","ko":"\ubcf4\ud1b5","nb":"Middels","nl":"Gemiddeld","pt-BR":"M\u00e9dio","pt-PT":"Interm\u00e9dio","sv":"Medium","th":"\u0e1b\u0e32\u0e19\u0e01\u0e25\u0e32\u0e07","zh-CN":"\u4e2d\u7b49","zh-TW":"\u4e2d\u7b49"},"value":"medium"},{"label":{"da":"Stor","de":"Gro\u00df","en":"Large","es":"Grande","fi":"Suuri","fr":"Grande","hi":"\u092c\u0921\u093c\u093e","it":"Large","ja":"\u5927","ko":"\ub77c\uc9c0","nb":"Stor","nl":"Groot","pt-BR":"Grande","pt-PT":"Grande","sv":"Stor","th":"\u0e43\u0e2b\u0e0d\u0e48","zh-CN":"\u5927","zh-TW":"\u5927\u578b"},"value":"large"}]},{"type":"text","id":"title","label":{"da":"Overskrift","de":"Titel","en":"Heading","es":"T\u00edtulo","fi":"Otsake","fr":"En-t\u00eate","hi":"\u0936\u0940\u0930\u094d\u0937\u0915","it":"Heading","ja":"\u898b\u51fa\u3057","ko":"\uc81c\ubaa9","nb":"Overskrift","nl":"Kop","pt-BR":"T\u00edtulo","pt-PT":"T\u00edtulo","sv":"Rubrik","th":"\u0e2a\u0e48\u0e27\u0e19\u0e2b\u0e31\u0e27","zh-CN":"\u6807\u9898","zh-TW":"\u6a19\u984c"},"default":{"da":"Billede med tekstoverlejring","de":"Foto mit \u00fcberlegtem Text","en":"Image with text overlay","es":"Imagen con texto","fi":"Kuva p\u00e4\u00e4ll\u00e4 olevalla tekstill\u00e4","fr":"Image avec superposition de texte","hi":"\u092a\u093e\u0920 \u0913\u0935\u0930\u0932\u0947 \u0915\u0947 \u0938\u093e\u0925 \u0907\u092e\u0947\u091c","it":"Immagine con testo","ja":"\u30c6\u30ad\u30b9\u30c8\u30aa\u30fc\u30d0\u30fc\u30ec\u30a4\u4ed8\u304d\u753b\u50cf","ko":"\ud14d\uc2a4\ud2b8 \uc624\ubc84\ub808\uc774 \ud3ec\ud568 \uc774\ubbf8\uc9c0","nb":"Bilde med tekstoverlegg","nl":"Foto met tekstoverlay","pt-BR":"Imagem com sobreposi\u00e7\u00e3o de texto","pt-PT":"Imagem com sobreposi\u00e7\u00e3o de texto","sv":"Bild med text\u00f6verlagring","th":"\u0e01\u0e32\u0e23\u0e27\u0e32\u0e07\u0e0b\u0e49\u0e2d\u0e19\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21","zh-CN":"\u5e26\u6587\u672c\u53e0\u52a0\u7684\u56fe\u7247","zh-TW":"\u9644\u6587\u5b57\u758a\u52a0\u7684\u5716\u7247"}},{"type":"richtext","id":"text","label":{"da":"Tekst","de":"Text","en":"Text","es":"Texto","fi":"Teksti","fr":"Texte","hi":"\u091f\u0947\u0915\u094d\u0938\u094d\u091f","it":"Testo","ja":"\u30c6\u30ad\u30b9\u30c8","ko":"\ud14d\uc2a4\ud2b8","nb":"Tekst","nl":"Tekst","pt-BR":"Texto","pt-PT":"Texto","sv":"Text","th":"\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21","zh-CN":"\u6587\u672c","zh-TW":"\u6587\u5b57"},"default":{"da":"<p>Brug tekstoverlejring til at give dine kunder indblik i dit brand. V\u00e6lg billeder og tekst, der passer til din stil og historie.<\/p>","de":"<p>Nutzen Sie \u00fcberlegten Text, um Kunden \u00fcber Ihre Marke zu informieren. W\u00e4hlen Sie Fotos und Text aus, die zu Ihrer Marke passen.<\/p>","en":"<p>Use overlay text to give your customers insight into your brand. Select imagery and text that relates to your style and story.<\/p>","es":"<p>Usa el texto superpuesto para darles informaci\u00f3n a tus clientes sobre tu marca. Selecciona im\u00e1genes y textos que se relacionen con tu estilo e historia.<\/p>","fi":"<p>K\u00e4yt\u00e4 taustan p\u00e4\u00e4ll\u00e4 olevaa teksti\u00e4, jotta asiakkaat voivat tutustua tuotemerkkisi. Valitse tyylisi ja tarinasi liittyv\u00e4t kuvat ja teksti.<\/p>","fr":"<p>Utilisez la superposition de texte pour donner un aper\u00e7u de votre marque \u00e0 vos clients. Utilisez une image et du texte qui se rapportent au style et \u00e0 l'histoire de votre marque.<\/p>","hi":"<p>\u0905\u092a\u0928\u0947 \u092c\u094d\u0930\u093e\u0902\u0921 \u092e\u0947\u0902 \u0905\u092a\u0928\u0947 \u0917\u094d\u0930\u093e\u0939\u0915\u094b\u0902 \u0915\u094b \u091c\u093e\u0928\u0915\u093e\u0930\u0940 \u0926\u0947\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0913\u0935\u0930\u0932\u0947 \u091f\u0947\u0915\u094d\u0938\u094d\u091f \u0915\u093e \u0909\u092a\u092f\u094b\u0917 \u0915\u0930\u0947\u0902. \u0905\u092a\u0928\u0940 \u0938\u094d\u091f\u093e\u0907\u0932 \u0914\u0930 \u0915\u0939\u093e\u0928\u0940 \u0938\u0947 \u0938\u0902\u092c\u0902\u0927\u093f\u0924 \u0915\u0932\u094d\u092a\u0928\u093e \u0914\u0930 \u092a\u093e\u0920 \u0915\u093e \u091a\u092f\u0928 \u0915\u0930\u0947\u0902.<\/p>","it":"<p>Utilizza il testo in sovrapposizione per dare ai clienti informazioni sul tuo brand. Seleziona immagini e testo legati al tuo stile e alla tua storia.<\/p>","ja":"<p>\u30aa\u30fc\u30d0\u30fc\u30ec\u30a4\u30c6\u30ad\u30b9\u30c8\u3092\u4f7f\u7528\u3057\u3066\u3001\u304a\u5ba2\u69d8\u304c\u3042\u306a\u305f\u306e\u30d6\u30e9\u30f3\u30c9\u306b\u3064\u3044\u3066\u3088\u304f\u7406\u89e3\u3067\u304d\u308b\u3088\u3046\u306b\u3057\u307e\u3059\u3002\u3042\u306a\u305f\u306e\u30b9\u30bf\u30a4\u30eb\u3084\u30b9\u30c8\u30fc\u30ea\u30fc\u306b\u95a2\u9023\u3059\u308b\u753b\u50cf\u3084\u30c6\u30ad\u30b9\u30c8\u3092\u9078\u629e\u3057\u3066\u304f\u3060\u3055\u3044\u3002<\/p>","ko":"<p>\uc624\ubc84\ub808\uc774 \ud14d\uc2a4\ud2b8\ub97c \uc0ac\uc6a9\ud558\uc5ec \uace0\uac1d\uc5d0\uac8c \ube0c\ub79c\ub4dc\uc5d0 \ub300\ud55c \ud1b5\ucc30\ub825\uc744 \ubd80\uc5ec\ud558\uc2ed\uc2dc\uc624. \uc790\uc2e0\uc758 \uc2a4\ud0c0\uc77c\uacfc \uc774\uc57c\uae30\uc640 \uad00\ub828\ub41c \uc774\ubbf8\uc9c0\uc640 \ud14d\uc2a4\ud2b8\ub97c \uc120\ud0dd\ud558\uc2ed\uc2dc\uc624.<\/p>","nb":"<p>Bruk overleggstekst til \u00e5 gi kundene dine innsikt i merkevaren din. Velg bildebruk og tekst som er relatert til din stil og historie.<\/p>","nl":"<p>Gebruik overlay-tekst om uw klanten inzicht te geven in uw merk. Selecteer afbeeldingen en tekst die betrekking hebben op uw stijl en verhaal.<\/p>","pt-BR":"<p>Use o texto de sobreposi\u00e7\u00e3o para apresentar insights sobre sua marca aos clientes. Selecione imagens e textos que reflitam seu estilo e sua hist\u00f3ria.<\/p>","pt-PT":"<p>Utilize o texto de sobreposi\u00e7\u00e3o para fornecer informa\u00e7\u00f5es sobre a sua marca aos clientes. Selecione imagens e textos que reflitam o seu estilo e a sua hist\u00f3ria.<\/p>","sv":"<p>Anv\u00e4nd \u00f6verl\u00e4ggningstext f\u00f6r att ge dina kunder inblick i ditt varum\u00e4rke. V\u00e4lj bildspr\u00e5k och text som g\u00e4ller din stil och historia.<\/p>","th":"<p>\u0e43\u0e0a\u0e49\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e0b\u0e49\u0e2d\u0e19\u0e17\u0e31\u0e1a\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e43\u0e2b\u0e49\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e17\u0e23\u0e32\u0e1a\u0e16\u0e36\u0e07\u0e23\u0e32\u0e22\u0e25\u0e30\u0e40\u0e2d\u0e35\u0e22\u0e14\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c \u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e39\u0e1b\u0e20\u0e32\u0e1e\u0e41\u0e25\u0e30\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e17\u0e35\u0e48\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e1a\u0e2a\u0e44\u0e15\u0e25\u0e4c\u0e01\u0e31\u0e1a\u0e40\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e23\u0e32\u0e27\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13<\/p>","zh-CN":"<p>\u4f7f\u7528\u53e0\u52a0\u6587\u672c\u8ba9\u5ba2\u6237\u6df1\u5165\u4e86\u89e3\u60a8\u7684\u54c1\u724c\u3002\u9009\u62e9\u4e0e\u60a8\u7684\u98ce\u683c\u548c\u6545\u4e8b\u76f8\u5173\u7684\u56fe\u7247\u548c\u6587\u672c\u3002<\/p>","zh-TW":"<p>\u904b\u7528\u6587\u5b57\u758a\u52a0\u8b93\u9867\u5ba2\u66f4\u52a0\u77ad\u89e3\u60a8\u7684\u54c1\u724c\u3002\u9078\u64c7\u8207\u60a8\u98a8\u683c\u548c\u54c1\u724c\u6545\u4e8b\u76f8\u95dc\u7684\u5716\u50cf\u548c\u6587\u5b57\u3002<\/p>"}},{"type":"text","id":"button_label","label":{"da":"Knapetiket","de":"Button-Etikett","en":"Button label","es":"Etiqueta de bot\u00f3n","fi":"Painikkeen merkint\u00e4","fr":"Texte du bouton","hi":"\u092c\u091f\u0928 \u0932\u0947\u092c\u0932","it":"Etichetta pulsante","ja":"\u30dc\u30bf\u30f3\u30e9\u30d9\u30eb","ko":"\ubc84\ud2bc \ub808\uc774\ube14","nb":"Knappetikett","nl":"Knoplabel","pt-BR":"Etiqueta do bot\u00e3o","pt-PT":"Etiqueta do bot\u00e3o","sv":"Knappetikett","th":"\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e1b\u0e38\u0e48\u0e21","zh-CN":"\u6309\u94ae\u6807\u7b7e","zh-TW":"\u6309\u9215\u6a19\u7c64"}},{"type":"url","id":"button_link","label":{"da":"Knaplink","de":"Button-Etikett","en":"Button link","es":"Enlace de bot\u00f3n","fi":"Painikkeen linkki","fr":"Lien du bouton","hi":"\u092c\u091f\u0928 \u0932\u093f\u0902\u0915","it":"Link pulsante","ja":"\u30dc\u30bf\u30f3\u30ea\u30f3\u30af","ko":"\ubc84\ud2bc \ub9c1\ud06c","nb":"Kobling for knapp","nl":"Knoplink","pt-BR":"Link do bot\u00e3o","pt-PT":"Liga\u00e7\u00e3o do bot\u00e3o","sv":"Knappl\u00e4nk","th":"\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e02\u0e2d\u0e07\u0e1b\u0e38\u0e48\u0e21","zh-CN":"\u6309\u94ae\u94fe\u63a5","zh-TW":"\u6309\u9215\u9023\u7d50"}}]}
+{% endschema %}
+
