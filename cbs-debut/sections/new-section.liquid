@@ -1,0 +1,90 @@
+      <div class="page-width">
+        <div class="section-block">
+            <div class="section-block __header section-block__ header--padded text-center">
+              <h4 class="h1--mini section-block__title">Text columns with images</h4>
+            </div>
+
+          <div class="flex column-flex">
+              <div class="flex__item column-overlay text-center">
+                  <noscript>
+                    <div class="column-flex__image" style="background-image: url(http://images.google.com/imageurl.jpg); background-position: center center;"></div>
+                  </noscript>
+                  <div class="column-flex__image lazyload"
+                    style="background-position: center center; background-image: url('http://images.google.com/imageurl.jpg);">
+                  </div>
+                <div class="column-flex__content">
+                  <p class="h5">Image Title</p>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+
+{% schema %}
+  {
+    "name": "Text columns with images",
+    "class": "index-section",
+    "max_blocks": 24,
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "title_enable",
+        "label": "Show header",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Text columns with images"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "text_block",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Add a title or tagline"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "radio",
+            "id": "image_align",
+            "label": "Image alignment",
+            "options": [
+              { "value": "top center", "label": "Top center" },
+              { "value": "center center", "label": "Center" },
+              { "value": "bottom center", "label": "Bottom center" }
+            ],
+            "default": "top center"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Overlay Columns",
+        "category": "Text",
+        "blocks": [
+          {
+            "type": "text_block"
+          },
+          {
+            "type": "text_block"
+          },
+          {
+            "type": "text_block"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
